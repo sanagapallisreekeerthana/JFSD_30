@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<!-- Component Scanning for Controllers, Services, DAOs -->
+	<context:component-scan
+		base-package="com.jfsd_lab.exp_6" />
+
+	<!-- View Resolver for JSP files -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- Enable annotations in the project -->
+	<context:annotation-config />
+
+	<!-- Enable transaction management for @Transactional annotations -->
+	<tx:annotation-driven
+		transaction-manager="transactionManager" />
+
+	<!-- Hibernate Transaction Manager -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- DataSource for MySQL -->
+	<bean id="ds"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"
+			value="com.mysql.cj.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://localhost:3306/klu" />
+		<property name="username" value="root" />
+		<property name="password" value="1512" />
+	</bean>
+
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="ds" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+		<!-- Define model class to be managed by Hibernate -->
+		<property name="annotatedClasses">
+			<list>
+				<value>com.jfsd_lab.exp_6.model.User</value>
+				<value>com.jfsd_lab.exp_6.model.Event</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- HibernateTemplate Bean -->
+	<bean id="ht"
+		class="org.springframework.orm.hibernate5.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- StudentDAO Bean with HibernateTemplate -->
+	<bean id="userDAO_Impl"
+		class="com.jfsd_lab.exp_6.dao.UserDAO_Impl">
+		<property name="ht" ref="ht" />
+	</bean>
+
+	<bean id="eventsDAO_Impl"
+		class="com.jfsd_lab.exp_6.dao.EventsDAO_Impl">
+		<property name="ht" ref="ht" />
+	</bean>
+
+</beans>
